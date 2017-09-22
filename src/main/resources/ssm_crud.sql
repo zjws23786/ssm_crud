@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50717
 File Encoding         : 65001
 
-Date: 2017-09-20 18:09:58
+Date: 2017-09-22 18:17:21
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -20,21 +20,24 @@ SET FOREIGN_KEY_CHECKS=0;
 -- ----------------------------
 DROP TABLE IF EXISTS `tbl_dept`;
 CREATE TABLE `tbl_dept` (
-  `dept_id` int(11) NOT NULL,
+  `dept_id` int(11) NOT NULL AUTO_INCREMENT,
   `dept_name` varchar(255) NOT NULL,
   PRIMARY KEY (`dept_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of tbl_dept
 -- ----------------------------
+INSERT INTO `tbl_dept` VALUES ('1', '开发部');
+INSERT INTO `tbl_dept` VALUES ('2', '测试部');
+INSERT INTO `tbl_dept` VALUES ('3', 'QA');
 
 -- ----------------------------
 -- Table structure for tbl_emp
 -- ----------------------------
 DROP TABLE IF EXISTS `tbl_emp`;
 CREATE TABLE `tbl_emp` (
-  `emp_id` int(11) NOT NULL,
+  `emp_id` int(11) NOT NULL AUTO_INCREMENT,
   `emp_name` varchar(255) NOT NULL,
   `gender` char(1) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,

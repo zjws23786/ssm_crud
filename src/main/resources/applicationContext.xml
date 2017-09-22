@@ -9,6 +9,12 @@
         http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
         http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
 
+
+    <context:component-scan base-package="com.hh.ssm_crud">
+        <context:exclude-filter type="annotation"
+                                expression="org.springframework.stereotype.Controller" />
+    </context:component-scan>
+
     <!--Spring的配置文件，这里主要配置和业务逻辑有关的-->
 
     <!--==========数据源配置=========================-->
@@ -27,13 +33,23 @@
         <property name="dataSource" ref="pooledDataSource"></property>
 
         <!--指定mybatis，mapper文件的位置-->
-        <!--<property name="mapperLocations" value="classpath:mapper/*.xml"></property>-->
+        <property name="mapperLocations" value="classpath:mapper/*.xml"></property>
     </bean>
 
+    <!--
+        批量mapper配置
+        从mapper包中扫描出mapper接口，自动创建代理对象并且在spring容
+        器中注入
+        遵循规范：将mapper.java和mapper.xml映射文件名称保持一致，且在一个目录中
+        自动扫描出来的mapper的bean的id为mapper类名（首写字母小写）
+    -->
     <!--配置扫描器，将mybatis接口的实现加入到ioc容器中-->
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!-- 指定扫描的包名
+        如果扫描多个包，每个包中间使用半角逗号分隔
+        -->
         <!--扫描所有dao接口的实现，加入到ioc容器中-->
-        <property name="basePackage" value="com.hh.ssm_crud.dao"></property>
+        <property name="basePackage" value="com.hh.ssm_crud.dao"/>
     </bean>
 
     <!--配置一个可以执行批量的sqlSession-->

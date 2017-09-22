@@ -22,6 +22,19 @@
     <!--两个标准配置  -->
     <!-- 将springmvc不能处理的请求交给tomcat -->
     <mvc:default-servlet-handler/>
+
+    <!--配置注解处理器映射器和适配器 有两种方式-->
+    <!--注解处理器映射器-->
+    <!--<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping">-->
+    <!--</bean>-->
+    <!--&lt;!&ndash;注解适配器&ndash;&gt;-->
+    <!--<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">-->
+    <!--</bean>-->
+    <!--第二种方式用驱动形式
+    mvc:annotation-driven：默认加载了很多的参数绑定方法
+    比如json转换解析器就是默认加载了，如果使用mvc:annotation-driven
+    不用配置上面RequestMappingHandlerMapping和RequestMappingHandlerAdapter
+    实际开发中使用mvc:annotation-driven-->
     <!-- 能支持springmvc更高级的一些功能，JSR303校验，快捷的ajax...映射动态请求 -->
     <mvc:annotation-driven/>
 </beans>
