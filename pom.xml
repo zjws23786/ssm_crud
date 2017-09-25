@@ -83,6 +83,12 @@
       <version>6.0.6</version>
     </dependency>
 
+    <!--引入第三方插件分页-->
+    <dependency>
+      <groupId>com.github.pagehelper</groupId>
+      <artifactId>pagehelper</artifactId>
+      <version>5.1.2</version>
+    </dependency>
 
     <!--jstl-->
     <!-- https://mvnrepository.com/artifact/jstl/jstl -->

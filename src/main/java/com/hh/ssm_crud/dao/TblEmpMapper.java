@@ -16,6 +16,10 @@ public interface TblEmpMapper {
 
     List<TblEmp> selectByExample(TblEmpExample example);
 
+    List<TblEmp> selectByExampleWithDept(TblEmpExample example);
+
+    TblEmp selectByPrimaryKeyWithDept(Integer empId);
+
     int updateByExampleSelective(@Param("record") TblEmp record, @Param("example") TblEmpExample example);
 
     int updateByExample(@Param("record") TblEmp record, @Param("example") TblEmpExample example);

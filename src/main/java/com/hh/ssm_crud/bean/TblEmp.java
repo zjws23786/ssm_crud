@@ -11,6 +11,16 @@ public class TblEmp {
 
     private Integer deptid;
 
+    private TblDept department;
+
+    public TblDept getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(TblDept department) {
+        this.department = department;
+    }
+
     public TblEmp() {
     }
 

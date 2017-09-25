@@ -11,4 +11,10 @@
         <package name="com.hh.ssm_crud.bean"/>
     </typeAliases>
 
+    <plugins>
+        <plugin interceptor="com.github.pagehelper.PageInterceptor">
+
+        </plugin>
+    </plugins>
+
 </configuration>
