@@ -20,8 +20,9 @@ import java.util.UUID;
 /**
  * Created by hjz on 2017/9/21 0021.
  * Describe：Mybatis和spring整合
+ * 使用Junit4形式来测试
  */
-public class TestMyBatisIntegrationSpring {
+public class JunitTestMyBatisIntegrationSpring {
     //创建SpringIOC容器【ioc把对象的创建不是通过new方式实现，而是交给spring配置创建类对象】
     private ApplicationContext ioc = null;
 
@@ -53,7 +54,7 @@ public class TestMyBatisIntegrationSpring {
         TblEmpMapper bean = sqlSession.getMapper(TblEmpMapper.class);
         Random rand = new Random();
         int[] randonInt = {1,2};
-        String[] sexStr = {"M","M"}; //女、男
+        String[] sexStr = {"W","M"}; //女、男
         for(int i = 0;i<1000;i++){
             String uid = UUID.randomUUID().toString().substring(0,5)+i;
             bean.insertSelective(new TblEmp(null,uid, sexStr[rand.nextInt(sexStr.length)], uid+"@atguigu.com", 1));
