@@ -36,7 +36,7 @@ public class EmployeeController {
     }
 
     //跳页形式（只支持网页版，不支持移动客户端）
-//    @RequestMapping("/emps")
+    @RequestMapping("/emps_model")
     public String getEmps(@RequestParam(value = "pn",defaultValue = "1")Integer pn,
                           Model model){
         //这里分页使用第三方插件
