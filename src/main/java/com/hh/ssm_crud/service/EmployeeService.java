@@ -16,4 +16,8 @@ public class EmployeeService {
     public List<TblEmp> getAll() {
         return tblEmpMapper.selectByExampleWithDept(null);
     }
+
+    public void save(TblEmp employee) {
+        tblEmpMapper.insertSelective(employee);
+    }
 }

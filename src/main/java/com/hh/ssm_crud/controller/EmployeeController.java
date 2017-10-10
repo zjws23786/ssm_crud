@@ -8,7 +8,10 @@ import com.hh.ssm_crud.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -20,20 +23,6 @@ public class EmployeeController {
 
     @Autowired
     EmployeeService employeeService;
-
-    /**
-     * 导入jackson包。
-     * @param pn
-     * @return   返回json格式数据，网页、移动客户端都支持
-     */
-    @RequestMapping("/emps")
-    @ResponseBody
-    public BaseObj getEmpsWithJson(@RequestParam(value = "pn",defaultValue = "1")Integer pn){
-        PageHelper.startPage(pn,5); //传入的是页码和每页的大小
-        List<TblEmp> emps = employeeService.getAll();
-        PageInfo page = new PageInfo(emps, 5);
-        return BaseObj.success().addDataObject(page);
-    }
 
     //跳页形式（只支持网页版，不支持移动客户端）
     @RequestMapping("/emps_model")
@@ -49,5 +38,33 @@ public class EmployeeController {
         PageInfo pageInfo = new PageInfo(emps,5);
         model.addAttribute("pageInfo", pageInfo);
         return "list";
+    }
+
+    /**
+     * 导入jackson包。
+     * @param pn
+     * @return   返回json格式数据，网页、移动客户端都支持
+     */
+    @RequestMapping("/emps")
+    @ResponseBody
+    public BaseObj getEmpsWithJson(@RequestParam(value = "pn",defaultValue = "1")Integer pn){
+        PageHelper.startPage(pn,5); //传入的是页码和每页的大小
+        List<TblEmp> emps = employeeService.getAll();
+        PageInfo page = new PageInfo(emps, 5);
+        return BaseObj.success().addDataObject(page);
+    }
+
+    /**
+     * 新增员工保存
+     * 1、前后台双重校验，确保数据的准确性
+     *      1.1、使用spring自带的JSR303校验
+     *      1.2、需要结合Hibernate-Validator
+     * @return
+     */
+    @RequestMapping(value = "/emp",method = RequestMethod.POST)
+    @ResponseBody
+    public BaseObj saveEmp(@Validated TblEmp employee, BindingResult result){
+        employeeService.save(employee);
+        return BaseObj.success();
     }
 }

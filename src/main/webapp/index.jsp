@@ -78,7 +78,8 @@
                     <div class="form-group">
                         <label for="empName_add_modal" class="col-sm-2 control-label">用户名</label>
                         <div class="col-sm-7">
-                            <input type="text" class="form-control" id="empName_add_modal" placeholder="用户名">
+                            <input type="text" class="form-control" name="empName" id="empName_add_modal" placeholder="用户名">
+                            <span class="help-block"></span>
                         </div>
                     </div>
                         <%--性别--%>
@@ -97,14 +98,15 @@
                     <div class="form-group">
                         <label for="email_add_modal" class="col-sm-2 control-label">email</label>
                         <div class="col-sm-7">
-                            <input type="password" class="form-control" id="email_add_modal" placeholder="邮箱">
+                            <input name="email" class="form-control" id="email_add_modal" placeholder="邮箱">
+                            <span class="help-block"></span>
                         </div>
                     </div>
                         <%--部门--%>
                     <div class="form-group">
                         <label class="col-sm-2 control-label">部门</label>
                         <div class="col-sm-7">
-                            <select class="form-control" id="emp_add_modal_dept_list">
+                            <select class="form-control" id="emp_add_modal_dept_list" name="deptid">
                             </select>
                         </div>
                     </div>
@@ -112,8 +114,8 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="emp_add_btn">新增</button>
             </div>
         </div>
     </div>
@@ -143,15 +145,16 @@
     };
 
     var build_emps_table = function (result) {
+        console.log(result);
         //清空table中tbody表格内容
         $("#emps_table tbody").empty();
         var emps = result.data.list;
         $.each(emps, function (index, item) {
             var empIdTd = $("<td></td>").append(item.empId);
-            var empNameTd = $("<td></td>").append(item.empName);
+            var empNameTd = $("<td></td>").append(item.empName==null ? "":item.empName);
             var genderTd = $("<td></td>").append(item.gender == 'M' ? "男" : "女");
             var emailTd = $("<td></td>").append(item.email);
-            var deptNameId = $("<td></td>").append(item.department.deptName);
+            var deptNameId = $("<td></td>").append(item.department.deptName==null ? "":item.department.deptName);
             var editBtn = $("<button></button>").addClass("btn btn-primary btn-sm")
                 .append($("<span></span>").addClass("glyphicon glyphicon-pencil"))
                 .append("编辑");
@@ -242,14 +245,15 @@
         navEle.appendTo("#page_nav_area");
     };
 
+    //点击新增弹出框
     $("#add_emp_info").click(function () {
-        $("#emp_add_modal_dept_list").empty();
+        reset_form_data("#empAddModal form");
         $.ajax({
             url:"${APP_PATH}/depts",
             type:"GET",
             success:function (deptResult) {
                 $.each(deptResult.data,function (index,dept) {
-                    var option = $("<option></option>").append(dept.deptName);
+                    var option = $("<option></option>").append(dept.deptName).attr("value",this.deptId);;
                     option.appendTo("#emp_add_modal_dept_list");
                 })
             }
@@ -258,6 +262,72 @@
             backdrop:"static"
         });
     });
+
+    //清空表单数据
+    function reset_form_data(ele) {
+        $(ele)[0].result;
+        //清空表单样式
+        $(ele).find("*").removeClass("has-error has-success");
+        $(ele).find(".help-block").text("");
+    }
+
+
+    //保存新增的员工
+    $("#emp_add_btn").click(function () {
+        //1、先对要提交给服务器的数据进行校验
+        if (!validate_add_form()){
+            return false;
+        }
+
+        //2、发送ajax请求来保存新增的员工
+        $.ajax({
+            url:"${APP_PATH}/emp",
+            type:"POST",
+            data:$("#empAddModal form").serialize(), //表单系列化【要求表单中数据name值和业务层实体bean的名称一样】
+            success:function (result) {
+                console.log(result);
+            }
+        });
+    });
+
+    //校验表单数据
+    function validate_add_form() {
+        //1、部门名称  校验
+        var empName = $("#empName_add_modal").val();
+        //字母或数字长度6到16位，或者中文2到5位
+        var regName = /(^[a-zA-Z0-9_-]{6,16}$)|(^[\u2E80-\u9FFF]{2,5})/;
+        if (!regName.test(empName)){
+            //alert("用户名可以是2-5位中文或者6-16位英文和数字的组合");
+            show_validate_msg("#empName_add_modal", "error", "用户名可以是2-5位中文或者6-16位英文和数字的组合");
+            return false;
+        }else{
+            show_validate_msg("#empName_add_modal", "success", "");
+        }
+
+        //2、校验邮箱信息
+        var email = $("#email_add_modal").val();
+        var regEmail = /^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/;
+        if (!regEmail.test(email)){
+            show_validate_msg("#email_add_modal", "error", "邮箱格式不正确");
+            return false;
+        }else{
+            show_validate_msg("#email_add_modal", "success", "");
+        }
+        return true;
+    }
+
+    //显示校验结果的提示信息
+    function show_validate_msg(ele, status,msg) {
+        $(ele).parent().removeClass("has-success has-error");
+        $(ele).next("span").text("");
+        if ("success" == status){
+            $(ele).parent().addClass("has-success");
+            $(ele).next("span").text(msg);
+        }else if ("error" ==  status){
+            $(ele).parent().addClass("has-error");
+            $(ele).next("span").text(msg);
+        }
+    }
 
 
 </script>
