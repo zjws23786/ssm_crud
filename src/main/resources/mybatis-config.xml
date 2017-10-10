@@ -11,9 +11,20 @@
         <package name="com.hh.ssm_crud.bean"/>
     </typeAliases>
 
+    <!--
+        plugins在配置文件中的位置必须符合要求，否则会报错，顺序如下:
+        properties?, settings?,
+        typeAliases?, typeHandlers?,
+        objectFactory?,objectWrapperFactory?,
+        plugins?,
+        environments?, databaseIdProvider?, mappers?
+    -->
     <plugins>
         <plugin interceptor="com.github.pagehelper.PageInterceptor">
-
+            <!--分页合理化参数，默认值为false。当该参数设置为 true 时，
+            pageNum<=0 时会查询第一页， pageNum>pages（超过总数时），会查询最后一页。
+            默认false 时，直接根据参数进行查询-->
+            <property name="reasonable" value="true"/>
         </plugin>
     </plugins>
 

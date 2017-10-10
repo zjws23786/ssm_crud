@@ -9,12 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -63,8 +65,51 @@ public class EmployeeController {
      */
     @RequestMapping(value = "/emp",method = RequestMethod.POST)
     @ResponseBody
-    public BaseObj saveEmp(@Validated TblEmp employee, BindingResult result){
-        employeeService.save(employee);
-        return BaseObj.success();
+    public BaseObj saveEmp(@Valid TblEmp employee, BindingResult result){
+        if (result.hasErrors()){
+            //校验失败，应该返回失败，在模态框中显示校验失败的错误信息
+            Map<String,Object> map = new HashMap<String,Object>();
+            List<FieldError> errors = result.getFieldErrors();
+            for (FieldError fieldError : errors){
+                System.out.println("错误的字段名："+fieldError.getField());
+                System.out.println("错误信息："+fieldError.getDefaultMessage());
+                map.put(fieldError.getField(),fieldError.getDefaultMessage());
+            }
+            return BaseObj.fail(1,"校验失败").addDataObject(map);
+        }else{
+
+            boolean b = employeeService.checkUser(employee.getEmpName());
+            if(b){
+                employeeService.save(employee);
+                return BaseObj.success();
+            }else{
+                Map<String,Object> map = new HashMap<String ,Object>();
+                map.put("empName","用户名已存在");
+                return BaseObj.fail(2,"用户名已存在").addDataObject(map);
+            }
+
+        }
+    }
+
+    /**
+     * 检查用户名的唯一性
+     * @return
+     */
+    @RequestMapping("/checkuser")
+    @ResponseBody
+    public BaseObj checkUser(@RequestParam("empName")String empName){
+        //先判断用户名是否是合法的表达式;
+        String regx = "(^[a-zA-Z0-9_-]{6,16}$)|(^[\u2E80-\u9FFF]{2,5})";
+        if(!empName.matches(regx)){
+            return BaseObj.fail(1,"不符合规则").addDataObject("用户名必须是6-16位数字和字母的组合或者2-5位中文");
+        }
+        //数据库用户名重复校验
+        boolean b = employeeService.checkUser(empName);
+        if(b){
+            return BaseObj.success();
+        }else{
+            return BaseObj.fail(2,"用户名已存在").addDataObject("用户名已存在");
+        }
+
     }
 }

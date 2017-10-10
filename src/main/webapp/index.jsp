@@ -122,6 +122,7 @@
 </div>
 
 <script type="text/javascript">
+    var totalRecord; //总记录数，作用用于跳转到最后一页
     $(function () {
         to_page(1);
     })
@@ -187,6 +188,7 @@
         $("#page_info_area").append("当前是第" + result.data.pageNum + "页，")
             .append("总" + result.data.pages + "页，")
             .append("总" + result.data.total + "条记录");
+        totalRecord = result.data.total;
     };
 
     var build_page_nav = function (result) {
@@ -265,7 +267,7 @@
 
     //清空表单数据
     function reset_form_data(ele) {
-        $(ele)[0].result;
+        $(ele)[0].reset();
         //清空表单样式
         $(ele).find("*").removeClass("has-error has-success");
         $(ele).find(".help-block").text("");
@@ -279,13 +281,34 @@
             return false;
         }
 
+        //检查用户名是否是唯一性
+        if($(this).attr("ajax-va")=="error"){
+            show_validate_msg("#empName_add_modal", "error", "用户名已存在");
+            return false;
+        }
+
         //2、发送ajax请求来保存新增的员工
         $.ajax({
             url:"${APP_PATH}/emp",
             type:"POST",
             data:$("#empAddModal form").serialize(), //表单系列化【要求表单中数据name值和业务层实体bean的名称一样】
             success:function (result) {
-                console.log(result);
+                if(result.rCode == 0){
+                    //1、关闭模态框
+                    $("#empAddModal").modal("hide");
+                    //2、发送ajax请求显示最后一页数据
+                    to_page(totalRecord);
+                }else {
+                    //有哪个字段的错误信息就显示哪个字段的；
+                    if(undefined != result.data.email){
+                        //显示邮箱错误信息
+                        show_validate_msg("#email_add_modal", "error", result.data.email);
+                    }
+                    if(undefined != result.data.empName){
+                        //显示员工名字的错误信息
+                        show_validate_msg("#empName_add_modal", "error", result.data.empName);
+                    }
+                }
             }
         });
     });
@@ -329,6 +352,25 @@
         }
     }
 
+    //校验用户名是否可用（唯一性）
+    $("#empName_add_modal").change(function () {
+        //发送ajax请求校验用户名是否可用
+        var empName = this.value;
+        $.ajax({
+            url:"${APP_PATH}/checkuser",
+            data:"empName="+empName,
+            type:"POST",
+            success:function(result){
+                if(result.rCode==0){
+                    show_validate_msg("#empName_add_modal","success","用户名可用");
+                    $("#emp_add_btn").attr("ajax-va","success");
+                }else{
+                    show_validate_msg("#empName_add_modal","error",result.data);
+                    $("#emp_add_btn").attr("ajax-va","error");
+                }
+            }
+        });
+    });
 
 </script>
 
