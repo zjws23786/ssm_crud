@@ -64,13 +64,13 @@
 </div>
 
 
-<!-- 模态框Modal -->
+<!-- 新增 模态框Modal -->
 <div class="modal fade" id="empAddModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="myModalLabel">新增雇员</h4>
+                <h4 class="modal-title" id="myModalLabel">新增员工</h4>
             </div>
             <div class="modal-body">
                 <form class="form-horizontal">
@@ -87,10 +87,10 @@
                         <label class="col-sm-2 control-label">性别</label>
                         <div class="col-sm-7">
                             <label class="radio-inline">
-                                <input type="radio" name="gender" id="gender1_update_input" value="M" checked="checked"> 男
+                                <input type="radio" name="gender" value="M" checked="checked"> 男
                             </label>
                             <label class="radio-inline">
-                                <input type="radio" name="gender" id="gender2_update_input" value="F"> 女
+                                <input type="radio" name="gender" value="W"> 女
                             </label>
                         </div>
                     </div>
@@ -121,8 +121,65 @@
     </div>
 </div>
 
+<!-- 修改 模态框Modal -->
+<div class="modal fade" id="empUpdateModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">员工修改</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal">
+                    <%--用户名--%>
+                    <div class="form-group">
+                        <label for="empName_add_modal" class="col-sm-2 control-label">用户名</label>
+                        <div class="col-sm-7">
+                            <p class="form-control-static" id="empName_update_modal"></p>
+                        </div>
+                    </div>
+                    <%--性别--%>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">性别</label>
+                        <div class="col-sm-7">
+                            <label class="radio-inline">
+                                <input type="radio" name="gender" value="M" id="man_update_id"> 男
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="gender" value="W" id="woman_update_id"> 女
+                            </label>
+                        </div>
+                    </div>
+                    <%--email--%>
+                    <div class="form-group">
+                        <label for="email_add_modal" class="col-sm-2 control-label">email</label>
+                        <div class="col-sm-7">
+                            <input name="email" class="form-control" id="email_update_modal" placeholder="邮箱">
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                    <%--部门--%>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">部门</label>
+                        <div class="col-sm-7">
+                            <select class="form-control" id="emp_update_modal_dept_list" name="deptid">
+                            </select>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="emp_update_btn">修改</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script type="text/javascript">
     var totalRecord; //总记录数，作用用于跳转到最后一页
+    var currentPage; //当前页面
     $(function () {
         to_page(1);
     })
@@ -133,8 +190,6 @@
             data: "pn=" + pn,
             type: "GET",
             success: function (result) {
-//                    console.log(result);
-//                    console.log(result.data.navigatepageNums);
                 //1、解析并显示员工数据
                 build_emps_table(result);
                 //2、解析并显示分页信息
@@ -156,12 +211,12 @@
             var genderTd = $("<td></td>").append(item.gender == 'M' ? "男" : "女");
             var emailTd = $("<td></td>").append(item.email);
             var deptNameId = $("<td></td>").append(item.department.deptName==null ? "":item.department.deptName);
-            var editBtn = $("<button></button>").addClass("btn btn-primary btn-sm")
+            var editBtn = $("<button></button>").addClass("btn btn-primary btn-sm edit-btn")
                 .append($("<span></span>").addClass("glyphicon glyphicon-pencil"))
                 .append("编辑");
             //为编辑按钮添加一个自定义属性，来表示当前员工id
             editBtn.attr("edit-id", item.empId);
-            var delBtn = $("<button></button>").addClass("btn btn-danger btn-sm")
+            var delBtn = $("<button></button>").addClass("btn btn-danger btn-sm del-btn")
                 .append($("<span></span>")).addClass("glyphicon glyphicon-trash")
                 .append("删除");
             delBtn.attr("del-id", item.empId);
@@ -189,6 +244,7 @@
             .append("总" + result.data.pages + "页，")
             .append("总" + result.data.total + "条记录");
         totalRecord = result.data.total;
+        currentPage = result.data.pageNum;
     };
 
     var build_page_nav = function (result) {
@@ -250,20 +306,26 @@
     //点击新增弹出框
     $("#add_emp_info").click(function () {
         reset_form_data("#empAddModal form");
+        getDepts("#emp_add_modal_dept_list");
+        $("#empAddModal").modal({
+            backdrop:"static"
+        });
+    });
+
+    //获取所有部门数据
+    function getDepts(ele) {
+        $(ele).empty();
         $.ajax({
             url:"${APP_PATH}/depts",
             type:"GET",
             success:function (deptResult) {
                 $.each(deptResult.data,function (index,dept) {
                     var option = $("<option></option>").append(dept.deptName).attr("value",this.deptId);;
-                    option.appendTo("#emp_add_modal_dept_list");
+                    option.appendTo(ele);
                 })
             }
         })
-        $("#empAddModal").modal({
-            backdrop:"static"
-        });
-    });
+    }
 
     //清空表单数据
     function reset_form_data(ele) {
@@ -368,6 +430,56 @@
                     show_validate_msg("#empName_add_modal","error",result.data);
                     $("#emp_add_btn").attr("ajax-va","error");
                 }
+            }
+        });
+    });
+
+    /**********************************修改模块************************************************/
+    $(document).on("click",".edit-btn",function(){
+        $("#empUpdateModal form")[0].reset(); //清空弹出框内容
+        //1、获取部门
+        getDepts("#emp_update_modal_dept_list");
+
+        //2、获取员工数据
+        var empId = $(this).attr("edit-id");
+        $.ajax({
+            url:"${APP_PATH}/emp",
+            data:"empId="+empId,
+            type:"GET",
+            success:function (result) {
+                $("#empName_update_modal").text(result.data.empName);
+                $("#email_update_modal").val([result.data.email]);
+                $("#empUpdateModal input[name=gender]").val([result.data.gender]);
+                $("#empUpdateModal select").val([result.data.deptid]);
+                $("#emp_update_btn").attr("update_emp_id",result.data.empId);
+            }
+        });
+
+
+        $("#empUpdateModal").modal({
+            backdrop:"static"
+        });
+    });
+
+    //修改按钮事件处理
+    $("#emp_update_btn").click(function () {
+        var email = $("#email_update_modal").val();
+        var regEmail = /^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/;
+        if (!regEmail.test(email)){
+            show_validate_msg("#email_add_modal", "error", "邮箱格式不正确");
+            return;
+        }
+
+        var empId = $(this).attr("update_emp_id");
+        $.ajax({
+            url:"${APP_PATH}/empupdate/"+empId,
+            data:$("#empUpdateModal form").serialize(),
+            type:"PUT",
+            success:function (result) {
+                //1、关闭对话框
+                $("#empUpdateModal").modal("hide");
+                //2、回到本页面
+                to_page(currentPage);
             }
         });
     });

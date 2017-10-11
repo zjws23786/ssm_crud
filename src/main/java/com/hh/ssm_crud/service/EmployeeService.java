@@ -36,4 +36,14 @@ public class EmployeeService {
         long count = tblEmpMapper.countByExample(example);
         return count == 0;
     }
+
+    //根据id得到对应员工
+    public TblEmp getEmp(Integer empId) {
+        TblEmp tblEmp = tblEmpMapper.selectByPrimaryKey(empId);
+        return tblEmp;
+    }
+
+    public void updateEmp(TblEmp employee) {
+        tblEmpMapper.updateByPrimaryKeySelective(employee);
+    }
 }

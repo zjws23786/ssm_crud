@@ -23,4 +23,8 @@ public interface TblEmpMapper {
     int updateByExampleSelective(@Param("record") TblEmp record, @Param("example") TblEmpExample example);
 
     int updateByExample(@Param("record") TblEmp record, @Param("example") TblEmpExample example);
+
+    TblEmp selectByPrimaryKey(Integer empId);
+
+    void updateByPrimaryKeySelective(TblEmp employee);
 }
