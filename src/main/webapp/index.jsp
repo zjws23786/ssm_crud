@@ -38,6 +38,7 @@
         <table id="emps_table" class="table table-bordered table-hover" style="margin-top: 20px">
             <thead>
             <tr>
+                <th style="text-align: center"><input type="checkbox" id="checkbox_all"/></th>
                 <th style="text-align: center">#</th>
                 <th style="text-align: center">empName</th>
                 <th style="text-align: center">gender</th>
@@ -206,6 +207,7 @@
         $("#emps_table tbody").empty();
         var emps = result.data.list;
         $.each(emps, function (index, item) {
+            var checkBoxTd = $("<td><input type='checkbox' class='check_item'/></td>");
             var empIdTd = $("<td></td>").append(item.empId);
             var empNameTd = $("<td></td>").append(item.empName==null ? "":item.empName);
             var genderTd = $("<td></td>").append(item.gender == 'M' ? "男" : "女");
@@ -227,6 +229,7 @@
 
             //在这里需注意的是：append方法执行完成以后，还是返回原来的元素
             $("<tr></tr>").addClass("text-center")
+                .append(checkBoxTd)
                 .append(empIdTd)
                 .append(empNameTd)
                 .append(genderTd)
@@ -483,6 +486,34 @@
             }
         });
     });
+
+    /********************复选框全选或反选************************************************/
+    $("#checkbox_all").click(function () {
+        //attr获取checked是undefined;
+        //我们这些dom原生的属性；attr获取自定义属性的值；
+        //prop修改和读取dom原生属性的值
+        $(".check_item").prop("checked",$(this).prop("checked"));
+    });
+
+    $(document).on("click",".check_item",function () {
+        var flag = $(".check_item:checked").length == $(".check_item").length;
+        $("#checkbox_all").prop("checked",flag);
+    });
+
+    /********************单个删除或多个删除**************************************************/
+    //单个删除功能
+    $(document).on("click",".del-btn",function(){
+        var delId = $(this).attr("del-id");
+        $.ajax({
+            url:"${APP_PATH}/del",
+            data:"empId="+delId,
+            type:"DELETE",
+            success:function (result) {
+//                if (confirm())
+            }
+        });
+    });
+
 
 </script>
 

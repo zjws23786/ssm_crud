@@ -166,4 +166,21 @@ public class EmployeeController {
         employeeService.updateEmp(employee);
         return BaseObj.success();
     }
+
+    /**
+     * 删除员工（单个或批量删除）
+     * @return
+     */
+    @RequestMapping(value = "/del/{delIds}",method = RequestMethod.DELETE)
+    @ResponseBody
+    public BaseObj delEmp(@PathVariable(value = "delIds")String delIds){
+        if (delIds.contains("-")){ //批量删除
+
+        }else{  //单个删除
+            Integer empId = Integer.parseInt(delIds);
+            employeeService.delEmp(empId);
+            return BaseObj.success();
+        }
+        return  null;
+    }
 }

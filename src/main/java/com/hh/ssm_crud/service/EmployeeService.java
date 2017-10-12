@@ -46,4 +46,8 @@ public class EmployeeService {
     public void updateEmp(TblEmp employee) {
         tblEmpMapper.updateByPrimaryKeySelective(employee);
     }
+
+    public void delEmp(Integer empId) {
+        tblEmpMapper.deleteEmp(empId);
+    }
 }

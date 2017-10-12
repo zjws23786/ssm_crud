@@ -27,4 +27,6 @@ public interface TblEmpMapper {
     TblEmp selectByPrimaryKey(Integer empId);
 
     void updateByPrimaryKeySelective(TblEmp employee);
+
+    void deleteEmp(Integer empId);
 }

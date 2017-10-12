@@ -158,6 +158,12 @@
     where emp_id = #{empId,jdbcType=INTEGER}
   </select>
 
+  <!--根据员工id删除相关员工-->
+  <delete id="deleteEmp" parameterType="java.lang.Integer">
+    DELETE FROM tbl_emp
+    WHERE  emp_id = #{empId,jdbcType=INTEGER}
+  </delete>
+
 
   <delete id="deleteByExample" parameterType="com.hh.ssm_crud.bean.TblEmpExample">
     delete from tbl_emp
