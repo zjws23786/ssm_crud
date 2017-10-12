@@ -14,6 +14,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -175,12 +176,17 @@ public class EmployeeController {
     @ResponseBody
     public BaseObj delEmp(@PathVariable(value = "delIds")String delIds){
         if (delIds.contains("-")){ //批量删除
-
+            List<Integer> ids = new ArrayList<Integer>();
+            String[] idStrs = delIds.split("-");
+            for (String id : idStrs){
+                ids.add(Integer.parseInt(id));
+            }
+            employeeService.deleteBatch(ids);
+            return BaseObj.success();
         }else{  //单个删除
             Integer empId = Integer.parseInt(delIds);
             employeeService.delEmp(empId);
             return BaseObj.success();
         }
-        return  null;
     }
 }

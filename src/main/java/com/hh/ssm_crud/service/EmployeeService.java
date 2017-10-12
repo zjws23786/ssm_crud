@@ -50,4 +50,11 @@ public class EmployeeService {
     public void delEmp(Integer empId) {
         tblEmpMapper.deleteEmp(empId);
     }
+
+    public void deleteBatch(List<Integer> ids) {
+        TblEmpExample tblEmpExample = new TblEmpExample();
+        TblEmpExample.Criteria criteria = tblEmpExample.createCriteria();
+        criteria.andEmpIdIn(ids);
+        tblEmpMapper.deleteByExample(tblEmpExample);
+    }
 }

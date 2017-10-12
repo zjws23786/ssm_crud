@@ -30,7 +30,7 @@
     <div class="row">
         <div class="col-md-3 col-lg-offset-9">
             <button type="button" class="btn btn-primary" id="add_emp_info">新增</button>
-            <button type="button" class="btn btn-danger">删除</button>
+            <button type="button" class="btn btn-danger" id="del_choose_emp_all">删除</button>
         </div>
     </div>
 
@@ -504,14 +504,40 @@
     //单个删除功能
     $(document).on("click",".del-btn",function(){
         var delId = $(this).attr("del-id");
-        $.ajax({
-            url:"${APP_PATH}/del",
-            data:"empId="+delId,
-            type:"DELETE",
-            success:function (result) {
-//                if (confirm())
-            }
+        var empName = $(this).parents("tr").find("td:eq(2)").text();
+        if(confirm("确认删除【"+delId+"】吗？")){
+            $.ajax({
+                url:"${APP_PATH}/del/"+delId,
+                type:"DELETE",
+                success:function (result) {
+                    to_page(currentPage);
+                }
+            });
+        }
+    });
+
+    //批量删除
+    $("#del_choose_emp_all").click(function () {
+        var empNames = "";
+        var delIds = "";
+        $.each($(".check_item:checked"),function () {
+           empNames += $(this).parents("tr").find("td:eq(2)").text() + ",";
+           delIds += $(this).parents("tr").find("td:eq(1)").text() + "-";
         });
+        empNames = empNames.substring(0,empNames.length-1);
+        delIds = delIds.substring(0,delIds.length-1);
+        if (empNames.length > 0){
+            if (confirm("确认删除【"+empNames+"】吗？")){
+                $.ajax({
+                    url:"${APP_PATH}/del/"+delIds,
+                    type:"DELETE",
+                    success:function (rusult) {
+                        to_page(currentPage)
+                    }
+                });
+            }
+        }
+
     });
 
 
